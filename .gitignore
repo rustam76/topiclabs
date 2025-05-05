@@ -1,0 +1,50 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Environment variables
+.env
+*.env
+
+# Flask instance folder
+instance/
+
+# Flask SQLite database files
+*.db
+*.sqlite3
+
+# Logs and debug output
+*.log
+logs/
+*.pid
+
+# Virtual environment
+venv/
+.venv/
+env/
+ENV/
+
+# Cache files
+*.egg-info/
+.eggs/
+*.egg
+.Python
+pip-log.txt
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+
+# OS generated files
+.DS_Store
+Thumbs.db

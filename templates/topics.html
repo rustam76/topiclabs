@@ -1,0 +1,28 @@
+
+{% extends "layout.html" %}
+
+{% block title %}Search Page{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">📚 Daftar Topik dari Model LDA</h2>
+
+    {% if topics %}
+        <div class="list-group">
+            {% for topic in topics %}
+                <div class="list-group-item list-group-item-action mb-3 shadow-sm">
+                    <h5 class="mb-1">🔖 {{ topic.label }}</h5>
+                    <p class="mb-1"><strong>Kata Kunci:</strong> {{ topic.words }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">Belum ada topik yang tersedia.</div>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">← Kembali</a>
+    </div>
+</div>
+
+{% endblock content %}

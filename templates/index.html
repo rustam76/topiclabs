@@ -1,0 +1,45 @@
+
+
+{% extends "layout.html" %}
+
+{% block title %}Search Page{% endblock %}
+
+{% block content %}
+
+<div class="container form-container">
+    <h2>🎯 Prediksi Topik Berdasarkan Abstrak</h2>
+
+    <form method="post">
+        <div class="mb-4">
+            <label for="abstract" class="form-label fw-bold">Masukkan Abstrak:</label>
+            <textarea name="abstract" id="abstract" rows="6"
+                      class="form-control shadow-sm"
+                      placeholder="Tuliskan abstrak penelitian di sini..."
+                      required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-search me-2"></i>Prediksi Topik
+        </button>
+    </form>
+
+    <!-- Hasil Prediksi -->
+    {% if result %}
+        <div class="result-box">
+            <h4><i class="bi bi-journal-text icon-topic"></i>Hasil Prediksi</h4>
+            <hr>
+            <p><strong>Abstrak:</strong> {{ result.abstract }}</p>
+            <div class="alert alert-success d-flex align-items-center" role="alert">
+                <i class="bi bi-lightbulb-fill me-3" style="font-size: 1.5rem;"></i>
+                <div>
+                    <h5 class="mb-1">Topik Terdeteksi: <strong>{{ result.topic_label }}</strong></h5>
+                    <p class="mb-1">Kemiripan: <strong>{{ result.probability }}%</strong></p>
+                    <p class="mb-0">Kata kunci: <em>{{ result.words }}</em></p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+
+
+{% endblock content %}

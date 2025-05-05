@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="{{ url_for('static', filename='dist/css/bootstrap.min.css') }}"
+      rel="stylesheet"
+    />
+    
+    <link
+      href="{{ url_for('static', filename='dist/style.css') }}"
+      rel="stylesheet"
+    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <title>{% block title %}Kulu Search{% endblock %}</title> 
+    
+  </head>
+  <body>
+    <!-- Navbar or header can be added here if needed -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top">
+      <div class="container-fluid">
+          <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">
+              <i class="bi bi-journal-text me-2"></i>AbstrakAI
+          </a>
+  
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                  aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+  
+          <!-- Menu Navigasi -->
+          <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav mb-2 mb-lg-0">
+              <li class="nav-item">
+                  <a class="nav-link {{ 'active' if request.endpoint == 'index' }}" aria-current="page" href="{{ url_for('index') }}">Beranda</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link {{ 'active' if request.endpoint == 'view_topics' }}" href="{{ url_for('view_topics') }}">Topik LDA</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link {{ 'active' if request.endpoint == 'data_scrape' }}" href="{{ url_for('data_scrape') }}">Data Scraping</a>
+              </li>
+          </ul>
+          </div>
+      </div>
+  </nav>
+    {% block content %} 
+   
+    {% endblock %}
+    <footer style="position: bottom; text-align: center;">
+      &copy; 2025 Sistem Analisis LDA | Dibuat dengan ❤️ oleh Majid
+  </footer>
+    
+    <script
+      src="{{ url_for('static', filename='dist/js/bootstrap.bundle.min.js') }}"
+      crossorigin="anonymous"
+    ></script>
+
+    {% block javascripts %} 
+    {% endblock %}
+
+  </body>
+</html>
