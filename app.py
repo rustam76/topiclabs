@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, session
+from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 from flaskext.mysql import MySQL
 from scholarly import scholarly
 import mysql.connector
@@ -11,14 +11,33 @@ from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from langdetect import detect
 from gensim import corpora, models
 from utils import preprocess
+import pandas as pd
+from bertopic import BERTopic
+from sklearn.metrics import accuracy_score
+from sklearn.pipeline import Pipeline
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+import joblib
+import os
+import re
+from nltk.corpus import stopwords
+import nltk
+
 
 # Load environment variables
 load_dotenv()
-
+nltk.download('stopwords')
 app = Flask(__name__)
 
 app.static_folder = 'assets'
 app.secret_key = 'aBcD1234!@#$my_secret_key_flask_app'
+UPLOAD_FOLDER = 'uploads'
+MODEL_FOLDER = 'models'
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(MODEL_FOLDER, exist_ok=True)
+
 # Konfigurasi MySQL
 
 def get_db_connection():
@@ -30,8 +49,168 @@ def get_db_connection():
         port=os.getenv('DB_PORT', 3306)
     )
 
+# Fungsi preprocessing sederhana
+def preprocess(text):
+    text = re.sub(r'\d+', '', text)  # Hapus angka
+    text = re.sub(r'[^\w\s]', '', text)  # Hapus tanda baca
+    text = text.lower()  # Lowercase
+    tokens = text.split()
+    
+    # Stopword removal
+    stop_words = set(stopwords.words('indonesian') + stopwords.words('english'))
+    tokens = [word for word in tokens if word not in stop_words]
+    
+    return " ".join(tokens)
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    return render_template('index.html')
+
+
+# tf inverted
+@app.route('/tf-inverted', methods=['GET', 'POST'])
+def index_tf():
+    return render_template('TF-Inverted/index.html')
+
+
+@app.route('/data-scraping')
+def data_scraping():
+    return render_template('TF-Inverted/dokument.html', current_path=request.path)
+
+@app.route('/detail/<int:id>')
+def detail(id):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT title, abstract, link FROM tf_inverted_dokumen WHERE id = %s", (id,))
+    result = cursor.fetchone()
+    if not result:
+        return "Document not found", 404
+    return render_template('TF-Inverted/detail_dokumen.html', title=result[0], abstract=result[1], link=result[2])
+
+
+@app.route('/search', methods=['POST'])
+def search():
+    data = request.json
+    query = data.get('query')
+
+    if not query:
+        return jsonify({'error': 'woy kamu lupa isi pencariannya'}), 400
+
+    try:
+        # Simulating a database query for inverted search
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute("""
+            SELECT id,title, abstract, link
+            FROM tf_inverted_dokumen
+            WHERE MATCH(title, abstract) AGAINST (%s IN NATURAL LANGUAGE MODE)
+            LIMIT 10
+        """, (query,))
+
+        results = cursor.fetchall()
+
+        return jsonify({
+            'results': [
+                { 'id': row[0], 'title': row[1], 'abstract': row[2], 'link': row[3]} for row in results
+            ]
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/scrape-tf', methods=['POST'])
+def scrape_scholar():
+    if request.method == 'POST':
+        data = request.json
+        query = data.get('query')
+        search_query = scholarly.search_pubs(query)
+        results = []
+
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        count = 0  # <-- Inisialisasi count di sini
+
+        for _ in range(10):
+            try:
+                pub = next(search_query)
+                title = pub['bib']['title']
+                abstract = pub['bib']['abstract']
+                author = ', '.join(pub['bib']['author']) 
+                year = pub['bib']['pub_year']
+                venue = pub['bib']['venue']
+                link = pub['pub_url'] 
+
+                cursor.execute("SELECT COUNT(*) FROM tf_inverted_dokumen WHERE title = %s", (title,))
+                
+                if cursor.fetchone()[0] == 0:
+                    cursor.execute(
+                        """
+                        INSERT INTO tf_inverted_dokumen (title, author, abstract, year, venue, link) 
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                        """,
+                        (title, author, abstract, year, venue, link)
+                    )
+                    count += 1 
+
+            except StopIteration:
+                print("No more results available.")
+                break
+            except Exception as e:
+                print(f"Error occurred during scraping individual result: {e}")
+                continue
+
+        connection.commit() 
+        cursor.close()
+        connection.close()
+        return jsonify({'message': f'Scraping and saving completed successfully! {count} records saved.'})
+
+
+
+
+@app.route('/papers', methods=['GET'])
+def get_papers():
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM papers")
+    results = cursor.fetchall()
+
+    papers = [{'id': row[0], 'title': row[1], 'abstract': row[2], 'link': row[3]} for row in results]
+    return jsonify(papers)
+
+
+@app.route('/get_data', methods=['GET'])
+def get_data():
+    try:
+        page = int(request.args.get('page', 1))
+        limit = int(request.args.get('limit', 5))
+        offset = (page - 1) * limit
+
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM tf_inverted_dokumen")
+        total_items = cursor.fetchone()[0]
+
+        cursor.execute("SELECT * FROM tf_inverted_dokumen LIMIT %s OFFSET %s", (limit, offset))
+        rows = cursor.fetchall()
+
+        data = [{'title': row[1], 'abstract': row[2], 'link': row[3], 'vanue': row[4], 'year': row[5], 'author': row[6]} for row in rows]
+        total_pages = (total_items + limit - 1) // limit  # Ceiling division
+
+        return jsonify({
+            'results': data,
+            'totalPages': total_pages
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+
+# model lda
+
+@app.route('/lda', methods=['GET', 'POST'])
+def index_lda():
     result = None
     error = None
 
@@ -69,7 +248,7 @@ def index():
             except Exception as e:
                 error = f"Terjadi kesalahan: {str(e)}"
 
-    return render_template('index.html', result=result, error=error)
+    return render_template('lda/index.html', result=result, error=error)
 
 @app.route('/scrape')
 def data_scrape():
@@ -94,7 +273,7 @@ def data_scrape():
     connection.close()
 
     return render_template(
-        'scrape.html',
+        'lda/scrape.html',
         results=results,
         count=0,
         pagination={
@@ -202,7 +381,102 @@ def view_topics():
             'words': words
         })
 
-    return render_template('topics.html', topics=labeled_topics)
+    return render_template('lda/topics.html', topics=labeled_topics)
+
+# model bertopic
+
+@app.route('/bertopic', methods=['GET', 'POST'])
+def bertopic():
+    if request.method == 'POST':
+        if 'test' in request.files:
+            file = request.files['test']
+            path = os.path.join(UPLOAD_FOLDER, file.filename)
+            file.save(path)
+
+            df = pd.read_csv(path)
+
+            # Pastikan kolom content tersedia
+            if 'content' not in df.columns:
+                return "File harus memiliki kolom 'content'", 400
+
+            texts = df['title'].fillna('') + " " + df['content'].fillna('')
+            texts = texts.tolist()
+
+            # Koneksi ke database
+            connection = get_db_connection()
+            cursor = connection.cursor()
+
+            # Kosongkan tabel sebelum insert
+            cursor.execute("TRUNCATE TABLE tb_bertopic")
+            connection.commit()
+
+            # Masukkan data ke MySQL
+            for _, row in df.iterrows():
+                title = str(row['title']) if pd.notna(row['title']) else ""
+                content = str(row['content']) if pd.notna(row['content']) else ""
+                category = str(row['category']) if pd.notna(row['category']) else ""
+                tags = str(row['tags']) if pd.notna(row['tags']) else ""
+
+                cursor.execute(
+                    """
+                    INSERT INTO tb_bertopic (title, content, category, tags) 
+                    VALUES (%s, %s, %s, %s)
+                    """,
+                    (title, content, category, tags)
+                )
+            connection.commit()
+            cursor.close()
+            connection.close()
+        return redirect(url_for('bertopic') + '?success=1')
+
+    return render_template('bertopic/index.html')
+
+
+@app.route('/train-category-model', methods=['GET', 'POST'])
+def train_category_model():
+    try:
+        # Ambil data dari database
+        connection = get_db_connection()
+        query = "SELECT title, content, category FROM tb_bertopic"
+        df = pd.read_sql(query, connection)
+        connection.close()
+
+        if df.empty:
+            return "Tidak ada data untuk diproses."
+
+        # Gabungkan title dan content
+        df['text'] = df['title'].fillna('') + " " + df['content'].fillna('')
+        df['cleaned_text'] = df['text'].apply(preprocess)
+
+        # Siapkan X dan y
+        X = df['cleaned_text']
+        y = df['category']
+
+        # Split data untuk evaluasi
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+        # Buat pipeline model
+        model_clf = Pipeline([
+            ('tfidf', TfidfVectorizer()),
+            ('clf', LogisticRegression(max_iter=1000))
+        ])
+
+        # Latih model
+        model_clf.fit(X_train, y_train)
+
+        # Hitung akurasi
+        y_pred = model_clf.predict(X_test)
+        acc = accuracy_score(y_test, y_pred)
+
+        # Simpan model
+        model_path = os.path.join(MODEL_FOLDER, "category_classifier.pkl")
+        joblib.dump(model_clf, model_path)
+
+        # Redirect ke halaman bertopic dengan akurasi
+        return redirect(url_for('bertopic', accuracy=acc))
+
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=6060)

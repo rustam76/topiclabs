@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="{{ url_for('static', filename='dist/css/bootstrap.min.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='dist/style_tf.css') }}"
+      rel="stylesheet"
+    />
+    <title>{% block title %}Kulu Search{% endblock %}</title> <!-- Allow title to be overridden -->
+  </head>
+  <body>
+    <!-- Navbar or header can be added here if needed -->
+    {% include 'TF-Inverted/nav.html' %}
+    {% block content %} <!-- Content Block -->
+   
+    {% endblock %}
+
+    <!-- Scripts at the bottom to improve page load performance -->
+    <script
+      src="{{ url_for('static', filename='dist/js/bootstrap.bundle.min.js') }}"
+      crossorigin="anonymous"
+    ></script>
+
+    {% block javascripts %} <!-- You can add additional JS here -->
+    {% endblock %}
+  </body>
+</html>

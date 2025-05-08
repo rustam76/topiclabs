@@ -1,0 +1,12 @@
+{% extends "TF-inverted/base.html" %} {% block title %}Search Page{% endblock %} {% block
+content %}
+<div class="detail-card">
+  <h1 class="detail-title">{{ title }}</h1>
+  <p class="detail-abstract">{{ abstract }}</p>
+  <p class="detail-link">
+    <strong>Link:</strong> <a href="{{ link }}" target="_blank">{{ link }}</a>
+  </p>
+  <a href="/" class="btn btn-secondary mt-3">Kembali ke KuluKulu</a>
+</div>
+
+{% endblock content %}
