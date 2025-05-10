@@ -7,7 +7,7 @@ buka terminal
 ```bash
 venv/Scripts/Activate
 
-atau
+#atau
 
 source venv/Scripts/Activate
 ```
@@ -16,6 +16,6 @@ jalakan perintah
 
 ```bash
 flask run
-atau
+#atau
 python app.py
 ```
