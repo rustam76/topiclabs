@@ -1,12 +1,39 @@
-{% extends "TF-inverted/base.html" %} {% block title %}Search Page{% endblock %} {% block
-content %}
-<div class="detail-card">
-  <h1 class="detail-title">{{ title }}</h1>
-  <p class="detail-abstract">{{ abstract }}</p>
-  <p class="detail-link">
-    <strong>Link:</strong> <a href="{{ link }}" target="_blank">{{ link }}</a>
-  </p>
-  <a href="/tf-inverted" class="btn btn-secondary mt-3">Kembali ke KuluKulu</a>
+{% extends "layout/layout.html" %} {% block title %}Search Page{% endblock %} {%
+block content %}
+<div class="form-container py-5">
+  <div class="container mt-5">
+    <div class="detail-card">
+      <h1 class="detail-title">{{ title }}</h1>
+      <p class="detail-abstract">{{ abstract }}</p>
+      <p class="detail-link">
+        <strong>Link:</strong>
+        <a href="{{ link }}" target="_blank">{{ link }}</a>
+      </p>
+      <a href="/tf-inverted" class="btn btn-secondary mt-3"
+        >Kembali ke KuluKulu</a
+      >
+    </div>
+  </div>
 </div>
+  <style>
+    .detail-card {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .detail-title {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .detail-abstract {
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    .detail-link {
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
 
 {% endblock content %}

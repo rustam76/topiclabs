@@ -50,7 +50,7 @@ def get_db_connection():
         host=os.getenv('DB_HOST', 'localhost'),
         user=os.getenv('DB_USERNAME', 'root'),
         password=os.getenv('DB_PASS'),
-        database=os.getenv('DB_NAME', 'db_lda'),
+        database=os.getenv('DB_NAME', 'db_topiclab'),
         port=os.getenv('DB_PORT', 3306)
     )
 
@@ -73,12 +73,10 @@ def bertopic_preprocess(text):
 def index():
     return render_template('index.html')
 
-
 # tf inverted
 @app.route('/tf-inverted', methods=['GET', 'POST'])
 def index_tf():
     return render_template('TF-Inverted/index.html')
-
 
 @app.route('/data-scraping')
 def data_scraping():
@@ -174,7 +172,6 @@ def scrape_scholar():
 
 
 
-
 @app.route('/papers', methods=['GET'])
 def get_papers():
     connection = get_db_connection()
@@ -182,7 +179,7 @@ def get_papers():
     cursor.execute("SELECT * FROM papers")
     results = cursor.fetchall()
 
-    papers = [{'id': row[0], 'title': row[1], 'abstract': row[2], 'link': row[3]} for row in results]
+    papers = [{'id': row[0], 'title': row[1], 'abstract': row[2], 'link': row[6]} for row in results]
     return jsonify(papers)
 
 
@@ -201,9 +198,9 @@ def get_data():
         cursor.execute("SELECT * FROM tf_inverted_dokumen LIMIT %s OFFSET %s", (limit, offset))
         rows = cursor.fetchall()
 
-        data = [{'title': row[1], 'abstract': row[3], 'link': row[3], 'vanue': row[5], 'year': row[4], 'author': row[2]} for row in rows]
+        data = [{'title': row[1], 'abstract': row[2]} for row in rows]
         total_pages = (total_items + limit - 1) // limit  # Ceiling division
-
+        print("Data dikirim ke frontend:", data[:2])
         return jsonify({
             'results': data,
             'totalPages': total_pages
@@ -211,11 +208,10 @@ def get_data():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
+# end of tf inverted
 
 
 # model lda
-
 @app.route('/lda', methods=['GET', 'POST'])
 def index_lda():
     result = None
@@ -389,6 +385,9 @@ def view_topics():
         })
 
     return render_template('lda/topics.html', topics=labeled_topics)
+# end of model lda
+
+
 
 # model bertopic
 @app.route('/bertopic', methods=['GET', 'POST'])
@@ -598,6 +597,8 @@ def test_model():
         prediction = model_clf.predict([text])[0]
 
     return render_template('bertopic/test_model.html', prediction=prediction)
+
+# end of model bertopic
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=6060)

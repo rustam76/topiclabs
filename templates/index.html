@@ -1,178 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <title>TopicLab - Topic Modeling Explorer</title>
+{% extends "layout/layout.html" %}
 
-  <!-- Bootstrap CSS -->
-  <link
-    href="{{ url_for('static', filename='dist/css/bootstrap.min.css') }}"
-    rel="stylesheet"
-  />
+{% block title %}Home Page{% endblock %}
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: 'Roboto', sans-serif;
-      overflow: hidden;
-      color: white;
-    }
-
-    #bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-    }
-
-    .container-main {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      height: 90vh;
-    }
-
-    h1 {
-      font-size: 3rem;
-      font-weight: 700;
-      margin-bottom: 2rem;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
-      animation: fadeInDown 1.5s ease forwards;
-      opacity: 0;
-    }
-
-    .btn-container {
-      display: flex;
-      gap: 2rem;
-      flex-wrap: wrap;
-      justify-content: center;
-      animation: fadeInUp 1.5s ease forwards;
-      opacity: 0;
-    }
-
-    .btn-animated {
-      padding: 1rem 2rem;
-      font-size: 1.25rem;
-      font-weight: 600;
-      border-radius: 50px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-animated:hover {
-      transform: scale(1.15);
-      box-shadow: 0 8px 25px rgba(255, 255, 255, 0.6);
-      z-index: 10;
-    }
-
-    .btn-primary {
-      background: linear-gradient(45deg, #6a11cb, #2575fc);
-      border: none;
-      color: white;
-    }
-
-    .btn-success {
-      background: linear-gradient(45deg, #11998e, #38ef7d);
-      border: none;
-      color: white;
-    }
-
-    .btn-warning {
-      background: linear-gradient(45deg, #f7971e, #ffd200);
-      border: none;
-      color: black;
-    }
-
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    footer.footer {
-      text-align: center;
-      padding: 1rem 0;
-      background-color: rgba(0, 0, 0, 0.4);
-      font-size: 0.9rem;
-    }
-
-    @media (max-width: 480px) {
-      .btn-container {
-        flex-direction: column;
-        gap: 1.2rem;
-      }
-      .btn-animated {
-        width: 80vw;
-        font-size: 1.1rem;
-      }
-      h1 {
-        font-size: 2rem;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Canvas untuk Vanta.js -->
-  <div id="bg"></div>
-
-  <!-- Konten Utama -->
-  <div class="container-main">
-    <h1>Welcome to TopicLab</h1>
-    <div class="btn-container">
-      <a href="/lda" class="btn btn-primary btn-animated">Explore LDA</a>
-      <a href="/tf-inverted" class="btn btn-success btn-animated">Explore TF-IDF</a>
-      <a href="/bertopic" class="btn btn-warning btn-animated">Explore BERTopic</a>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <footer class="footer">
-    &copy; 2025 TopicLab - Dibuat dengan ❤️ Oleh Rustam
-  </footer>
-
-
-
+{% block content %}
  
-  <!-- Inisialisasi Vanta.js -->
-  <script>
-    VANTA.NET({
-      el: "#bg",
-      mouseControls: true,
-      touchControls: true,
-      gyroControls: false,
-      minHeight: 200.00,
-      minWidth: 200.00,
-      scale: 1.00,
-      scaleMobile: 1.00,
-      color: 0x2948ff,
-      backgroundColor: 0x0f142f,
-      points: 10.00,
-      maxDistance: 25.00,
-      spacing: 15.00
-    });
-  </script>
-
-  <!-- Bootstrap JS -->
-  <script
-    src="{{ url_for('static', filename='dist/js/bootstrap.bundle.min.js') }}"
-    crossorigin="anonymous">
-  </script>
-</body>
-</html>
+ <section class="hero-section">
+        <span class="exclamation exclamation-1">!</span>
+        <span class="exclamation exclamation-2">!!</span>
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content">
+                    <h1 class="hero-title">Selamat Datang di Topic Labs!</h1>
+                    <p class="hero-text">Eksplorasi dan uji coba model topic modeling terbaik seperti TF-IDF, LDA, dan BERTopic. Temukan wawasan dari data teks Anda dengan teknologi analisis topik canggih!</p>
+                    <div class="buttons">
+                        <a href="/tf-inverted" class="btn btn-comic btn-yellow">TF-IDF</a>
+                        <a href="/lda" class="btn btn-comic btn-red">LDA</a>
+                        <a href="/bertopic" class="btn btn-comic btn-blue">BERTopic</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 hero-image-container">
+                    <div class="speech-bubble">
+                        Analisis topik mudah dan cepat!
+                    </div>
+                    <img width="450px" src="{{ url_for('static', filename='hero.png') }}" alt="Comic Hero Image" class="hero-image img-fluid">
+                </div>
+            </div>
+        </div>
+    </section>
+ {% endblock %}

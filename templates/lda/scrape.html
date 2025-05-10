@@ -1,15 +1,17 @@
 
-{% extends "lda/layout.html" %}
+{% extends "layout/layout.html" %}
 
 {% block title %}Search Page{% endblock %}
 
 {% block content %}
     <div class="container my-4">
+        <a href="/lda" class="btn btn-info" >Kembali</a>
         <h1 class="text-center mb-4">Scraping dan Analisis LDA</h1>
         <div class="text-center mt-4 mb-4">
             <form method="POST" action="/generate-lda">
                 <button type="submit" class="btn btn-secondary" id="generateLdaBtn">Buat Model LDA</button>
             </form>
+            
         </div>
         <!-- Form Pencarian -->
         <form method="POST" action="/data-scrape" class="mb-4">

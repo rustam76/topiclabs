@@ -1,10 +1,12 @@
-{% extends "TF-Inverted/base.html" %}
+{% extends "layout/layout.html" %} 
+{% block title %}Search Page{% endblock %} 
 
-{% block title %}Search Page{% endblock %}
 
 {% block content %}
+<div class="form-container py-5">
     <div class="container mt-5">
         <h1>Data Google Scholar</h1>
+        <a href="/tf-inverted" class="btn btn-primary mb-3">Kembali</a>
         <form id="scrapeForm">
             <div class="mb-3 d-flex align-items-center">
                 <input type="text" class="form-control me-2" id="query" placeholder="Enter search query" name="keyword">
@@ -24,10 +26,10 @@
             <thead>
                 <tr>
                     <th>No</th>
-                    <th>Author</th>
+                    
                     <th>Title</th>
                     <th>Abstract</th>
-                    <th>Year</th>
+                    
                 </tr>
             </thead>
             <tbody>
@@ -40,77 +42,7 @@
             </ul>
         </nav>
     </div>
+    </div>
     {% endblock content %} 
-    {% block javascripts %}
-    <script>
-        let currentPage = 1;
-        const itemsPerPage = 5;
-
-        document.getElementById('scrapeForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
-            const query = document.getElementById('query').value;
-            const loadingDiv = document.getElementById('loading');
-            const responseDiv = document.getElementById('response');
-
-            loadingDiv.style.display = 'block';
-            responseDiv.innerHTML = '';
-
-            const response = await fetch('/scrape-tf', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query })
-            });
-
-            const data = await response.json();
-            loadingDiv.style.display = 'none';
-
-            if (response.ok) {
-                responseDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
-                fetchAndDisplayData(); // Refresh data table
-            } else {
-                responseDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
-            }
-        });
-
-        async function fetchAndDisplayData(page = 1) {
-            currentPage = page;
-            const response = await fetch(`/get_data?page=${page}&limit=${itemsPerPage}`, { method: 'GET' });
-            const data = await response.json();
-
-            const dataTableBody = document.querySelector('#dataTable tbody');
-            const pagination = document.getElementById('pagination');
-
-            dataTableBody.innerHTML = ''; // Clear existing data
-            pagination.innerHTML = ''; // Clear existing pagination
-
-            // Populate table
-            data.results.forEach((item, index) => {
-                const row = `
-                    <tr>
-                        <td>${(page - 1) * itemsPerPage + index + 1}</td>
-                        <td>${item.title}</td>
-                         <td>${item.author}</td>
-                         <td>${item.abstract}</td>
-                         <td>${item.year}</td>
-                        
-                    </tr>
-                `;
-                dataTableBody.innerHTML += row;
-            });
-
-            // Populate pagination
-            for (let i = 1; i <= data.totalPages; i++) {
-                const activeClass = i === page ? 'active' : '';
-                pagination.innerHTML += `
-                    <li class="page-item ${activeClass}">
-                        <a class="page-link" href="#" onclick="fetchAndDisplayData(${i})">${i}</a>
-                    </li>
-                `;
-            }
-        }
-
-        // Initial fetch to load data on page load
-        fetchAndDisplayData();
-    </script>
-    {% endblock javascripts %}
+    
 

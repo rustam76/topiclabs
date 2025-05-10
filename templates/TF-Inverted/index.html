@@ -1,20 +1,277 @@
-{% extends "TF-Inverted/base.html" %} 
+{% extends "layout/layout.html" %} 
 {% block title %}Search Page{% endblock %} 
 
+
 {% block content %}
+<!-- Comic Style CSS -->
+<style>
+    /* Comic Style CSS */
+    
+    .search-container {
+        position: relative;
+        min-height: 80vh;
+        background-color: #ffffff;
+        background-image: 
+            radial-gradient(#ff5252 2px, transparent 2px),
+            radial-gradient(#3d85c6 2px, transparent 2px);
+        background-size: 40px 40px;
+        background-position: 0 0, 20px 20px;
+        background-attachment: fixed;
+        opacity: 0.95;
+    }
+    
+    .overlay {
+        padding: 50px 20px;
+        position: relative;
+    }
+    
+    h1.display-4 {
+        font-weight: bold;
+        color: #000;
+        text-shadow: 3px 3px 0 #ffde59;
+        transform: rotate(-1deg);
+        margin-bottom: 30px;
+        font-size: 3.5rem;
+        position: relative;
+        display: inline-block;
+    }
+    
+    h1.display-4:after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 10%;
+        width: 80%;
+        height: 5px;
+        background-color: #ff5252;
+        border-radius: 5px;
+    }
+    
+    .input-group {
+        border: 3px solid #000;
+        border-radius: 50px !important;
+        overflow: hidden;
+        box-shadow: 5px 5px 0 #000 !important;
+        background-color: #fff;
+        padding: 0 !important;
+    }
+    
+    .form-control-lg {
+        border: none;
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 15px 25px;
+        border-radius: 50px 0 0 50px !important;
+        background-color: #fff;
+    }
+    
+    .form-control-lg:focus {
+        box-shadow: none;
+        border-color: transparent;
+    }
+    
+    .btn-primary {
+        background-color: #ff5252;
+        border: none;
+        border-left: 3px solid #000;
+        font-size: 1.2rem;
+        padding: 12px 25px;
+        transition: all 0.3s;
+    }
+    
+    .btn-primary:hover {
+        background-color: #e13e3e;
+        transform: scale(1.05);
+    }
+    
+    /* Results Styling */
+    #results {
+        margin-top: 40px;
+    }
+    
+    .card {
+        border: 3px solid #000;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 5px 5px 0 #3d85c6;
+        margin-bottom: 25px;
+        transform: rotate(-0.5deg);
+        transition: all 0.3s;
+        background-color: #fff;
+    }
+    
+    .card:nth-child(even) {
+        transform: rotate(0.5deg);
+        box-shadow: 5px 5px 0 #ff5252;
+    }
+    
+    .card:hover {
+        transform: scale(1.02) rotate(0);
+        box-shadow: 8px 8px 0 #ffde59;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    .card-title {
+        font-weight: bold;
+        font-size: 1.4rem;
+        color: #000;
+        position: relative;
+        display: inline-block;
+        margin-bottom: 15px;
+    }
+    
+    .card-title a {
+        color: #000;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .card-title a:hover {
+        color: #ff5252;
+        text-decoration: underline;
+    }
+    
+    .card-text {
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+    
+    /* Spinner */
+    .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        border-width: 0.35em;
+        color: #ffde59 !important;
+        border-right-color: transparent !important;
+        filter: drop-shadow(2px 2px 0 black);
+    }
+    
+    /* No Results */
+    .no-results {
+        background-color: #fff;
+        border: 3px solid #000;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 5px 5px 0 #ff5252;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .no-results img {
+        max-width: 200px;
+        border: 3px solid #000;
+        border-radius: 10px;
+    }
+    
+    marquee {
+        font-weight: bold;
+        font-size: 1.3rem;
+        color: #ff5252;
+        text-shadow: 1px 1px 0 #000;
+        margin-top: 15px;
+    }
+    
+    /* Alert */
+    .alert-danger {
+        background-color: #ff5252;
+        color: #fff;
+        border: 3px solid #000;
+        font-weight: bold;
+        border-radius: 10px;
+        padding: 15px 20px;
+        box-shadow: 5px 5px 0 #000;
+    }
+    
+    /* Comic Bubble Decorations */
+    .comic-bubble {
+        position: absolute;
+        background-color: #fff;
+        border: 3px solid #000;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        text-align: center;
+        line-height: 34px;
+        font-weight: bold;
+        font-size: 1.5rem;
+        animation: float 3s ease-in-out infinite;
+        z-index: 1;
+    }
+    
+    .bubble-1 {
+        top: 20px;
+        right: 15%;
+        background-color: #ffde59;
+        animation-delay: 0.5s;
+    }
+    
+    .bubble-2 {
+        bottom: 50px;
+        left: 10%;
+        background-color: #3d85c6;
+        animation-delay: 1s;
+    }
+    
+    .bubble-3 {
+        top: 30%;
+        left: 5%;
+        background-color: #ff5252;
+        animation-delay: 1.5s;
+    }
+    
+    @keyframes float {
+        0% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+        100% {
+            transform: translateY(0);
+        }
+    }
+    
+    /* Logo Animation */
+    @keyframes pulse {
+        0% {
+            transform: scale(1) rotate(-1deg);
+        }
+        50% {
+            transform: scale(1.05) rotate(-1deg);
+        }
+        100% {
+            transform: scale(1) rotate(-1deg);
+        }
+    }
+    
+    h1.display-4 {
+        animation: pulse 3s infinite;
+    }
+</style>
+
 <!-- Container Utama -->
 <div class="search-container">
-  <div class="overlay">
-    <h1 class="text-center mb-4 display-4">🧠 KuluKulu</h1>
 
+  <div class="overlay">
+    <!-- Elemen Dekorasi Bubble -->
+  
+    <div class="comic-bubble bubble-1">!</div>
+    <div class="comic-bubble bubble-2">?</div>
+    <div class="comic-bubble bubble-3">*</div>
+    
+    <h1 class="text-center mb-4 display-4">🧠 KuluKulu</h1>
+   
     <!-- Form dengan tombol di dalam input -->
     <form id="searchForm" class="text-center">
       <div class="form-group mb-3 position-relative d-flex justify-content-center">
-        <div class="input-group w-75 shadow-lg rounded-full">
+        <div class="input-group w-75">
           <input
             type="text"
-            class="form-control form-control-lg  ps-4"
-            placeholder="Cari apa..."
+            class="form-control form-control-lg ps-4 requaired"
+            placeholder="Cari apa kamu tahu..."
             id="query"
             aria-label="Search query"
           />
@@ -28,8 +285,8 @@
               fill="white"
               stroke-width="2"
               viewBox="0 0 24 24"
-              height="1em"
-              width="1em"
+              height="1.5em"
+              width="1.5em"
               xmlns="http://www.w3.org/2000/svg"
             >
               <circle cx="11" cy="11" r="8"></circle>
@@ -39,16 +296,18 @@
         </div>
       </div>
     </form>
-
+      <a class="btn btn-success" href="/data-scraping">Buat data</a>
     <!-- Loading Spinner -->
-    <div id="loading" class="text-center mt-3" style="display: none">
+    <div id="loading" class="text-center mt-4" style="display: none">
       <div class="spinner-border text-light" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
     </div>
 
     <!-- Hasil Pencarian -->
-    <div id="results" class="mt-5"></div>
+    <div id="results" class="mt-5 container">
+      <!-- Hasil pencarian akan ditampilkan di sini -->
+    </div>
 
     <!-- Audio Not Found -->
     <div id="audio-container">
@@ -62,71 +321,8 @@
   </div>
 </div>
 {% endblock content %}
- {% block javascripts %}
+
 <!-- Fungsi Pencarian -->
-<script>
-  document
-    .getElementById("searchForm")
-    .addEventListener("submit", async function (e) {
-      e.preventDefault();
-      const query = document.getElementById("query").value;
-      const resultsDiv = document.getElementById("results");
-      const loadingDiv = document.getElementById("loading");
-      const noResultsSound = document.getElementById("noResultsSound");
 
-      resultsDiv.innerHTML = "";
-      loadingDiv.style.display = "block";
 
-      try {
-        const response = await fetch("/search", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query }),
-        });
 
-        const data = await response.json();
-        loadingDiv.style.display = "none";
-
-        if (response.ok && data.results) {
-          if (data.results.length === 0) {
-            noResultsSound.play().catch((error) => {
-              console.error("Audio playback failed:", error);
-            });
-            resultsDiv.innerHTML = `
-            <div class="no-results text-center">
-              <img src="{{ url_for('static', filename='hmmm-gif.gif') }}" alt="No results" class="img-fluid mb-3">
-              <marquee behavior="scroll" direction="left" scrollamount="5">kamu cari apasih sampe ngak ada cok</marquee>
-            </div>
-          `;
-            return;
-          }
-
-          data.results.slice(0, 10).forEach((result) => {
-            const card = document.createElement("div");
-            card.className = "card mb-3 shadow-sm";
-            card.innerHTML = `
-            <div class="card-body">
-              <h5 class="card-title"><a href="/detail/${
-                result.id
-              }" class="text-decoration-none">${result.title}</a></h5>
-              <p class="card-text">${
-                result.abstract || "Tidak ada abstrak tersedia."
-              }</p>
-            </div>
-          `;
-            resultsDiv.appendChild(card);
-          });
-        } else {
-          resultsDiv.innerHTML = `<div class="alert alert-danger">${
-            data.error || "Terjadi kesalahan."
-          }</div>`;
-        }
-      } catch (error) {
-        loadingDiv.style.display = "none";
-        resultsDiv.innerHTML = `<div class="alert alert-danger">${
-          error.message || "Terjadi kesalahan."
-        }</div>`;
-      }
-    });
-</script>
-{% endblock javascripts %}

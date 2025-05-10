@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Topic Lab{% endblock %}</title>
+    <!-- Bootstrap CSS dari CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <!-- Font Comic Neue -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/comic-neue/4.0.0/css/comic-neue.min.css">
+    <style>
+        /* Comic Style CSS */
+        body {
+            font-family: 'Comic Neue', cursive;
+            background-color: #f9f9f9;
+            overflow-x: hidden;
+        }
+
+        /* Navbar Style */
+        .navbar {
+            background-color: #ffde59 !important;
+            border-bottom: 3px solid #000;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.8rem;
+            transform: rotate(-2deg);
+            padding: 0 10px;
+            background-color: #fff;
+            border: 2px solid #000;
+            border-radius: 8px;
+        }
+
+        .nav-link {
+            font-weight: bold;
+            color: #000 !important;
+            font-size: 1.2rem;
+            margin: 0 10px;
+            position: relative;
+        }
+
+        .nav-link:hover::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background-color: #ff5252;
+            bottom: 0;
+            left: 0;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            padding: 80px 0;
+            position: relative;
+            background-color: #ffffff;
+        }
+
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-image: 
+                radial-gradient(#ff5252 2px, transparent 2px),
+                radial-gradient(#3d85c6 2px, transparent 2px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-weight: bold;
+            font-size: 3rem;
+            color: #000;
+            text-shadow: 2px 2px 0 #ffde59;
+            transform: rotate(-1deg);
+            margin-bottom: 20px;
+        }
+
+        .hero-text {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border: 2px solid #000;
+            border-radius: 10px;
+            box-shadow: 3px 3px 0 #000;
+        }
+
+        .hero-image-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-image {
+            border: 3px solid #000;
+            border-radius: 10px;
+            box-shadow: 5px 5px 0 #ff5252;
+            transform: rotate(2deg);
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Comic Button Styles */
+        .btn-comic {
+            font-weight: bold;
+            padding: 12px 25px;
+            margin: 10px 10px 10px 0;
+            border: 3px solid #000;
+            border-radius: 10px;
+            box-shadow: 3px 3px 0 #000;
+            transition: all 0.2s;
+            position: relative;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+        }
+
+        .btn-comic:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 #000;
+        }
+
+        .btn-comic:active {
+            transform: translate(1px, 1px);
+            box-shadow: 2px 2px 0 #000;
+        }
+
+        .btn-yellow {
+            background-color: #ffde59;
+            color: #000;
+        }
+
+        .btn-red {
+            background-color: #ff5252;
+            color: #fff;
+        }
+
+        .btn-blue {
+            background-color: #3d85c6;
+            color: #fff;
+        }
+
+        /* Speech Bubble */
+        .speech-bubble {
+            position: absolute;
+            background-color: #fff;
+            border: 3px solid #000;
+            border-radius: 20px;
+            padding: 15px;
+            width: 200px;
+            top: -50px;
+            right: 30px;
+            font-weight: bold;
+            transform: rotate(5deg);
+        }
+
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            right: 30px;
+            width: 30px;
+            height: 15px;
+            background-color: #fff;
+            border-right: 3px solid #000;
+            border-bottom: 3px solid #000;
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
+        }
+
+        /* Footer Style */
+        footer {
+            background-color: #ff5252;
+            color: #fff;
+            padding: 30px 0;
+            border-top: 3px solid #000;
+            position: relative;
+        }
+
+        footer h5 {
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        footer ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        footer ul li {
+            margin-bottom: 10px;
+        }
+
+        footer ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer ul li a:hover {
+            color: #ffde59;
+            text-decoration: underline;
+        }
+
+        .copyright {
+            background-color: rgba(0,0,0,0.2);
+            padding: 15px 0;
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Exclamation Mark Decorations */
+        .exclamation {
+            position: absolute;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff5252;
+            transform: rotate(-15deg);
+        }
+
+        .exclamation-1 {
+            top: 20px;
+            right: 10%;
+        }
+
+        .exclamation-2 {
+            bottom: 50px;
+            left: 5%;
+        }
+          .search-container {
+        position: relative;
+        min-height: 80vh;
+        background-color: #ffffff;
+        background-image: 
+            radial-gradient(#ff5252 2px, transparent 2px),
+            radial-gradient(#3d85c6 2px, transparent 2px);
+        background-size: 40px 40px;
+        background-position: 0 0, 20px 20px;
+        background-attachment: fixed;
+        opacity: 0.95;
+    }
+     .form-container {
+        position: relative;
+        min-height: 80vh;
+        background-color: #ffffff;
+        background-image: 
+            radial-gradient(#ff5252 2px, transparent 2px),
+            radial-gradient(#3d85c6 2px, transparent 2px);
+        background-size: 40px 40px;
+        background-position: 0 0, 20px 20px;
+        background-attachment: fixed;
+        opacity: 0.95;
+    }
+      .overlay {
+        padding: 50px 20px;
+        position: relative;
+    }
+    </style>
+</head>
+<body>
+    {% include 'layout/nav.html' %}
+    <!-- Hero Section -->
+    {% block content %} 
+   
+    {% endblock %}
+
+     {% include 'layout/footer.html' %}
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    {% block javascripts %}
+
+    <script>
+  document
+    .getElementById("searchForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const query = document.getElementById("query").value;
+      const resultsDiv = document.getElementById("results");
+      const loadingDiv = document.getElementById("loading");
+      const noResultsSound = document.getElementById("noResultsSound");
+
+      resultsDiv.innerHTML = "";
+      loadingDiv.style.display = "block";
+
+      try {
+        const response = await fetch("/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query }),
+        });
+
+        const data = await response.json();
+        loadingDiv.style.display = "none";
+
+        if (response.ok && data.results) {
+          if (data.results.length === 0) {
+            noResultsSound.play().catch((error) => {
+              console.error("Audio playback failed:", error);
+            });
+            resultsDiv.innerHTML = `
+            <div class="no-results text-center">
+              <img src="{{ url_for('static', filename='hmmm-gif.gif') }}" alt="No results" class="img-fluid mb-3">
+              <marquee behavior="scroll" direction="left" scrollamount="5">kamu cari apasih sampe ngak ada cok</marquee>
+            </div>
+          `;
+            return;
+          }
+
+          data.results.slice(0, 10).forEach((result) => {
+            const card = document.createElement("div");
+            card.className = "card mb-3 shadow-sm";
+            card.innerHTML = `
+            <div class="card-body">
+              <h5 class="card-title"><a href="/detail/${
+                result.id
+              }" class="text-decoration-none">${result.title}</a></h5>
+              <p class="card-text">${
+                result.abstract || "Tidak ada abstrak tersedia."
+              }</p>
+            </div>
+          `;
+            resultsDiv.appendChild(card);
+          });
+        } else {
+          resultsDiv.innerHTML = `<div class="alert alert-danger">${
+            data.error || "Terjadi kesalahan."
+          }</div>`;
+        }
+      } catch (error) {
+        loadingDiv.style.display = "none";
+        resultsDiv.innerHTML = `<div class="alert alert-danger">${
+          error.message || "Terjadi kesalahan."
+        }</div>`;
+      }
+    });
+</script>
+
+    <script>
+        let currentPage = 1;
+        const itemsPerPage = 5;
+
+        document.getElementById('scrapeForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const query = document.getElementById('query').value;
+            const loadingDiv = document.getElementById('loading');
+            const responseDiv = document.getElementById('response');
+
+            loadingDiv.style.display = 'block';
+            responseDiv.innerHTML = '';
+
+            const response = await fetch('/scrape-tf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query })
+            });
+
+            const data = await response.json();
+            loadingDiv.style.display = 'none';
+
+            if (response.ok) {
+                responseDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                fetchAndDisplayData(); // Refresh data table
+            } else {
+                responseDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            }
+        });
+
+        async function fetchAndDisplayData(page = 1) {
+            currentPage = page;
+            const response = await fetch(`/get_data?page=${page}&limit=${itemsPerPage}`, { method: 'GET' });
+            const data = await response.json();
+
+            const dataTableBody = document.querySelector('#dataTable tbody');
+            const pagination = document.getElementById('pagination');
+
+            dataTableBody.innerHTML = ''; // Clear existing data
+            pagination.innerHTML = ''; // Clear existing pagination
+
+            // Populate table
+            data.results.forEach((item, index) => {
+                const row = `
+                    <tr>
+                        <td>${(page - 1) * itemsPerPage + index + 1}</td>
+                        <td>${item.title}</td>
+                        
+                         <td>${item.abstract}</td>
+                         
+                    </tr>
+                `;
+                dataTableBody.innerHTML += row;
+            });
+
+            // Populate pagination
+            for (let i = 1; i <= data.totalPages; i++) {
+                const activeClass = i === page ? 'active' : '';
+                pagination.innerHTML += `
+                    <li class="page-item ${activeClass}">
+                        <a class="page-link" href="#" onclick="fetchAndDisplayData(${i})">${i}</a>
+                    </li>
+                `;
+            }
+        }
+
+        // Initial fetch to load data on page load
+        fetchAndDisplayData();
+    </script>
+    {% endblock javascripts %}
+</body>
+</html>
