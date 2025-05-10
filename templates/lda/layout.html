@@ -37,7 +37,7 @@
           <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             <ul class="navbar-nav mb-2 mb-lg-0">
               <li class="nav-item">
-                  <a class="nav-link {{ 'active' if request.endpoint == 'index' }}" aria-current="page" href="{{ url_for('index') }}">Beranda</a>
+                  <a class="nav-link {{ 'active' if request.endpoint == 'lda' }}" aria-current="page" href="{{ url_for('index_lda') }}">Beranda</a>
               </li>
               <li class="nav-item">
                   <a class="nav-link {{ 'active' if request.endpoint == 'view_topics' }}" href="{{ url_for('view_topics') }}">Topik LDA</a>
@@ -52,10 +52,9 @@
     {% block content %} 
    
     {% endblock %}
-    <footer style="position: bottom; text-align: center;">
-      &copy; 2025 Sistem Analisis LDA | Dibuat dengan ❤️ oleh Majid
-  </footer>
-    
+    <footer class="footer">
+      &copy; 2025 TopicLab - Dibuat dengan ❤️ Oleh Rustam
+    </footer>
     <script
       src="{{ url_for('static', filename='dist/js/bootstrap.bundle.min.js') }}"
       crossorigin="anonymous"

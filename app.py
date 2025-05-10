@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, session, jsonify
+from flask import Flask, request, render_template, redirect, url_for, session,  jsonify, Response
 from flaskext.mysql import MySQL
 from scholarly import scholarly
 import mysql.connector
@@ -13,11 +13,16 @@ from gensim import corpora, models
 from utils import preprocess
 import pandas as pd
 from bertopic import BERTopic
-from sklearn.metrics import accuracy_score
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
+import seaborn as sns
+import matplotlib.pyplot as plt
+import base64
+import io
+import urllib.parse
 import joblib
 import os
 import re
@@ -50,7 +55,7 @@ def get_db_connection():
     )
 
 # Fungsi preprocessing sederhana
-def preprocess(text):
+def bertopic_preprocess(text):
     text = re.sub(r'\d+', '', text)  # Hapus angka
     text = re.sub(r'[^\w\s]', '', text)  # Hapus tanda baca
     text = text.lower()  # Lowercase
@@ -61,6 +66,8 @@ def preprocess(text):
     tokens = [word for word in tokens if word not in stop_words]
     
     return " ".join(tokens)
+    
+    return tokens
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -194,7 +201,7 @@ def get_data():
         cursor.execute("SELECT * FROM tf_inverted_dokumen LIMIT %s OFFSET %s", (limit, offset))
         rows = cursor.fetchall()
 
-        data = [{'title': row[1], 'abstract': row[2], 'link': row[3], 'vanue': row[4], 'year': row[5], 'author': row[6]} for row in rows]
+        data = [{'title': row[1], 'abstract': row[3], 'link': row[3], 'vanue': row[5], 'year': row[4], 'author': row[2]} for row in rows]
         total_pages = (total_items + limit - 1) // limit  # Ceiling division
 
         return jsonify({
@@ -384,9 +391,28 @@ def view_topics():
     return render_template('lda/topics.html', topics=labeled_topics)
 
 # model bertopic
-
 @app.route('/bertopic', methods=['GET', 'POST'])
 def bertopic():
+    accuracy = request.args.get('accuracy')
+    success = request.args.get('success')
+    error = request.args.get('error')
+    if accuracy:
+        accuracy = float(accuracy)
+
+    # Muat hasil evaluasi jika tersedia
+    conf_matrix_img = None
+    class_report_img = None
+
+    eval_path = os.path.join(MODEL_FOLDER, "evaluation_results.pkl")
+    if os.path.exists(eval_path):
+        try:
+            eval_result = joblib.load(eval_path)
+            accuracy = round(eval_result['accuracy'] * 100, 2)
+            conf_matrix_img = eval_result.get('conf_matrix_img')
+            class_report_img = eval_result.get('class_report_img')
+        except Exception:
+            pass
+
     if request.method == 'POST':
         if 'test' in request.files:
             file = request.files['test']
@@ -395,22 +421,17 @@ def bertopic():
 
             df = pd.read_csv(path)
 
-            # Pastikan kolom content tersedia
             if 'content' not in df.columns:
                 return "File harus memiliki kolom 'content'", 400
 
             texts = df['title'].fillna('') + " " + df['content'].fillna('')
             texts = texts.tolist()
 
-            # Koneksi ke database
             connection = get_db_connection()
             cursor = connection.cursor()
-
-            # Kosongkan tabel sebelum insert
             cursor.execute("TRUNCATE TABLE tb_bertopic")
             connection.commit()
 
-            # Masukkan data ke MySQL
             for _, row in df.iterrows():
                 title = str(row['title']) if pd.notna(row['title']) else ""
                 content = str(row['content']) if pd.notna(row['content']) else ""
@@ -429,8 +450,14 @@ def bertopic():
             connection.close()
         return redirect(url_for('bertopic') + '?success=1')
 
-    return render_template('bertopic/index.html')
-
+    return render_template(
+        'bertopic/index.html',
+        accuracy=accuracy,
+        success=success,
+        error=error,
+        conf_matrix_img=f"data:image/png;base64,{conf_matrix_img}" if conf_matrix_img else None,
+        class_report_img=f"data:image/png;base64,{class_report_img}" if class_report_img else None
+    )
 
 @app.route('/train-category-model', methods=['GET', 'POST'])
 def train_category_model():
@@ -442,11 +469,11 @@ def train_category_model():
         connection.close()
 
         if df.empty:
-            return "Tidak ada data untuk diproses."
+             return redirect(url_for('bertopic', error="Data kosong"))
 
         # Gabungkan title dan content
         df['text'] = df['title'].fillna('') + " " + df['content'].fillna('')
-        df['cleaned_text'] = df['text'].apply(preprocess)
+        df['cleaned_text'] = df['text'].apply(bertopic_preprocess)
 
         # Siapkan X dan y
         X = df['cleaned_text']
@@ -464,19 +491,113 @@ def train_category_model():
         # Latih model
         model_clf.fit(X_train, y_train)
 
-        # Hitung akurasi
+        # Prediksi dan evaluasi
         y_pred = model_clf.predict(X_test)
         acc = accuracy_score(y_test, y_pred)
+        class_report = classification_report(y_test, y_pred, output_dict=True)
+        conf_matrix = confusion_matrix(y_test, y_pred)
+
+        # Gambar confusion matrix
+        plt.figure(figsize=(8, 6))
+        sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues',
+                    xticklabels=model_clf.classes_, yticklabels=model_clf.classes_)
+        plt.xlabel("Predicted")
+        plt.ylabel("Actual")
+        plt.title("Confusion Matrix")
+
+        img = io.BytesIO()
+        plt.savefig(img, format='png', bbox_inches='tight')
+        img.seek(0)
+        conf_matrix_url = base64.b64encode(img.getvalue()).decode('utf8')
+        plt.close()
+
+        # Gambar classification report
+        report_df = pd.DataFrame(class_report).transpose()
+        plt.figure(figsize=(10, 6))
+        sns.heatmap(report_df.iloc[:-1].T, annot=True, cmap="YlGnBu", cbar=False)
+        plt.title("Classification Report")
+
+        img2 = io.BytesIO()
+        plt.savefig(img2, format='png', bbox_inches='tight')
+        img2.seek(0)
+        class_report_url = base64.b64encode(img2.getvalue()).decode('utf8')
+        plt.close()
 
         # Simpan model
         model_path = os.path.join(MODEL_FOLDER, "category_classifier.pkl")
         joblib.dump(model_clf, model_path)
 
-        # Redirect ke halaman bertopic dengan akurasi
-        return redirect(url_for('bertopic', accuracy=acc))
+        # Simpan hasil evaluasi untuk ditampilkan nanti
+        eval_result = {
+            'accuracy': acc,
+            'conf_matrix_img': conf_matrix_url,
+            'class_report_img': class_report_url
+        }
+        eval_path = os.path.join(MODEL_FOLDER, "evaluation_results.pkl")
+        joblib.dump(eval_result, eval_path)
+
+        # Redirect ke bertopic dengan query param akurasi
+        return redirect(url_for('bertopic', accuracy=round(acc * 100, 2)))
 
     except Exception as e:
         return f"Error: {str(e)}"
+    
+
+@app.route('/download-template')
+def download_template():
+    # Membuat DataFrame kosong dengan kolom yang diperlukan
+    template_df = pd.DataFrame(columns=["title", "content", "category", "tags"])
+    
+    # Simpan ke buffer CSV
+    csv_data = template_df.to_csv(index=False)
+    return Response(
+        csv_data,
+        mimetype="text/csv",
+        headers={"Content-disposition": "attachment; filename=template_dataset.csv"}
+    )
+
+@app.route('/reset-model')
+def reset_model():
+    try:
+        # Hapus data dari tabel tb_bertopic
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        # Kosongkan tabel
+        cursor.execute("DELETE FROM tb_bertopic")
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        # Hapus file model dan hasil evaluasi jika ada
+        model_path = os.path.join(MODEL_FOLDER, "category_classifier.pkl")
+        eval_path = os.path.join(MODEL_FOLDER, "evaluation_results.pkl")
+
+        if os.path.exists(model_path):
+            os.remove(model_path)
+        if os.path.exists(eval_path):
+            os.remove(eval_path)
+
+        return redirect(url_for('bertopic'))
+
+    except Exception as e:
+        return redirect(url_for('bertopic'))
+
+@app.route('/test-model', methods=['GET', 'POST'])
+def test_model():
+    prediction = None
+    if request.method == 'POST':
+        text = request.form.get('text')
+        model_path = os.path.join(MODEL_FOLDER, "category_classifier.pkl")
+
+        if not os.path.exists(model_path):
+            return "Model belum dilatih.", 404
+
+        model_clf = joblib.load(model_path)
+        prediction = model_clf.predict([text])[0]
+
+    return render_template('bertopic/test_model.html', prediction=prediction)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=6060)

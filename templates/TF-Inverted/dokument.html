@@ -24,9 +24,10 @@
             <thead>
                 <tr>
                     <th>No</th>
+                    <th>Author</th>
                     <th>Title</th>
                     <th>Abstract</th>
-                    <th>Link</th>
+                    <th>Year</th>
                 </tr>
             </thead>
             <tbody>
@@ -88,8 +89,10 @@
                     <tr>
                         <td>${(page - 1) * itemsPerPage + index + 1}</td>
                         <td>${item.title}</td>
-                        <td>${item.abstract}</td>
-                        <td><a href="${item.link}" target="_blank">View</a></td>
+                         <td>${item.author}</td>
+                         <td>${item.abstract}</td>
+                         <td>${item.year}</td>
+                        
                     </tr>
                 `;
                 dataTableBody.innerHTML += row;

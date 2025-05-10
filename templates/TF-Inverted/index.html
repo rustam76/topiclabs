@@ -1,55 +1,69 @@
-{% extends "TF-Inverted/base.html" %}
-
-{% block title %}Search Page{% endblock %}
+{% extends "TF-Inverted/base.html" %} 
+{% block title %}Search Page{% endblock %} 
 
 {% block content %}
-
+<!-- Container Utama -->
 <div class="search-container">
-  <h1 class="text-center mb-4">KuluKulu</h1>
-  <form id="searchForm" class="text-center">
-    <div class="form-group mb-3">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Cari apa..."
-        id="query"
-      />
-      <div class="icon">
-        <svg
-          stroke="currentColor"
-          fill="none"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          height="1em"
-          width="1em"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
+  <div class="overlay">
+    <h1 class="text-center mb-4 display-4">🧠 KuluKulu</h1>
+
+    <!-- Form dengan tombol di dalam input -->
+    <form id="searchForm" class="text-center">
+      <div class="form-group mb-3 position-relative d-flex justify-content-center">
+        <div class="input-group w-75 shadow-lg rounded-full">
+          <input
+            type="text"
+            class="form-control form-control-lg  ps-4"
+            placeholder="Cari apa..."
+            id="query"
+            aria-label="Search query"
+          />
+          <button
+            class="btn btn-primary rounded-end-pill px-4"
+            type="submit"
+            id="searchButton"
+          >
+            <svg
+              stroke="currentColor"
+              fill="white"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              height="1em"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="text-center mt-3" style="display: none">
+      <div class="spinner-border text-light" role="status">
+        <span class="visually-hidden">Loading...</span>
       </div>
     </div>
-    <button class="btn btn-custom mt-3">Tekan untuk mencari</button>
-  </form>
 
-  <div id="loading" class="text-center mt-3" style="display: none">
-    <div class="spinner-border text-primary" role="status"></div>
-  </div>
-  <div id="results" class="mt-4">
-    <!-- Cards will be dynamically added here -->
-  </div>
-  <div id="audio-container">
-    <audio id="noResultsSound">
-      <source
-        src="{{ url_for('static', filename='saya.mp3') }}"
-        type="audio/mpeg"
-      />
-    </audio>
+    <!-- Hasil Pencarian -->
+    <div id="results" class="mt-5"></div>
+
+    <!-- Audio Not Found -->
+    <div id="audio-container">
+      <audio id="noResultsSound">
+        <source
+          src="{{ url_for('static', filename='saya.mp3') }}"
+          type="audio/mpeg"
+        />
+      </audio>
+    </div>
   </div>
 </div>
-{% endblock content %} {% block javascripts %}
+{% endblock content %}
+ {% block javascripts %}
+<!-- Fungsi Pencarian -->
 <script>
   document
     .getElementById("searchForm")
@@ -60,8 +74,8 @@
       const loadingDiv = document.getElementById("loading");
       const noResultsSound = document.getElementById("noResultsSound");
 
-      resultsDiv.innerHTML = ""; // Clear previous results
-      loadingDiv.style.display = "block"; // Show loading spinner
+      resultsDiv.innerHTML = "";
+      loadingDiv.style.display = "block";
 
       try {
         const response = await fetch("/search", {
@@ -71,52 +85,46 @@
         });
 
         const data = await response.json();
-        loadingDiv.style.display = "none"; // Hide loading spinner
+        loadingDiv.style.display = "none";
 
         if (response.ok && data.results) {
           if (data.results.length === 0) {
-            // Play sound and show GIF
             noResultsSound.play().catch((error) => {
               console.error("Audio playback failed:", error);
             });
             resultsDiv.innerHTML = `
-                            <div class="no-results">
-                                <img src="{{ url_for('static', filename='hmmm-gif.gif') }}" alt="No results">
-                                <marquee behavior="scroll" direction="left" scrollamount="5">kamu cari apasih sampe ngak ada cok</marquee>
-                            </div>
-                        `;
+            <div class="no-results text-center">
+              <img src="{{ url_for('static', filename='hmmm-gif.gif') }}" alt="No results" class="img-fluid mb-3">
+              <marquee behavior="scroll" direction="left" scrollamount="5">kamu cari apasih sampe ngak ada cok</marquee>
+            </div>
+          `;
             return;
           }
 
-          // Display the top 10 results
           data.results.slice(0, 10).forEach((result) => {
             const card = document.createElement("div");
-            card.className = "card mb-3";
-
-            // Add link to the detail page
+            card.className = "card mb-3 shadow-sm";
             card.innerHTML = `
-                            <div class="card-body">
-                                <h5 class="card-title"><a href="/detail/${
-                                  result.id
-                                }" class="text-decoration-none">${
-              result.title
-            }</a></h5>
-                                <p class="card-text">${
-                                  result.abstract || "No abstract available."
-                                }</p>
-                            </div>
-                        `;
+            <div class="card-body">
+              <h5 class="card-title"><a href="/detail/${
+                result.id
+              }" class="text-decoration-none">${result.title}</a></h5>
+              <p class="card-text">${
+                result.abstract || "Tidak ada abstrak tersedia."
+              }</p>
+            </div>
+          `;
             resultsDiv.appendChild(card);
           });
         } else {
           resultsDiv.innerHTML = `<div class="alert alert-danger">${
-            data.error || "An error occurred."
+            data.error || "Terjadi kesalahan."
           }</div>`;
         }
       } catch (error) {
-        loadingDiv.style.display = "none"; // Hide loading spinner
+        loadingDiv.style.display = "none";
         resultsDiv.innerHTML = `<div class="alert alert-danger">${
-          error.message || "An error occurred."
+          error.message || "Terjadi kesalahan."
         }</div>`;
       }
     });

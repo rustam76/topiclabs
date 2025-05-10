@@ -11,13 +11,16 @@
       href="{{ url_for('static', filename='dist/style_tf.css') }}"
       rel="stylesheet"
     />
-    <title>{% block title %}Kulu Search{% endblock %}</title> <!-- Allow title to be overridden -->
+    <title>{% block title %}Kulu Search{% endblock %}</title>
+    <!-- Allow title to be overridden -->
   </head>
   <body>
+    <div id="bg"></div>
+
     <!-- Navbar or header can be added here if needed -->
-    {% include 'TF-Inverted/nav.html' %}
-    {% block content %} <!-- Content Block -->
-   
+    {% include 'TF-Inverted/nav.html' %} {% block content %}
+    <!-- Content Block -->
+
     {% endblock %}
 
     <!-- Scripts at the bottom to improve page load performance -->
@@ -26,7 +29,23 @@
       crossorigin="anonymous"
     ></script>
 
-    {% block javascripts %} <!-- You can add additional JS here -->
+    {% block javascripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.birds.min.js"></script>
+
+    <script>
+      VANTA.BIRDS({
+        el: "#bg",
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.0,
+        minWidth: 200.0,
+        scale: 1.0,
+        scaleMobile: 1.0,
+        backgroundColor: 0xfafafa,
+      });
+    </script>
     {% endblock %}
   </body>
 </html>

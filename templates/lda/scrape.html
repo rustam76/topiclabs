@@ -6,7 +6,11 @@
 {% block content %}
     <div class="container my-4">
         <h1 class="text-center mb-4">Scraping dan Analisis LDA</h1>
-
+        <div class="text-center mt-4 mb-4">
+            <form method="POST" action="/generate-lda">
+                <button type="submit" class="btn btn-secondary" id="generateLdaBtn">Buat Model LDA</button>
+            </form>
+        </div>
         <!-- Form Pencarian -->
         <form method="POST" action="/data-scrape" class="mb-4">
             <div class="row g-3">
@@ -99,10 +103,28 @@
         {% endif %}
 
         <!-- Tombol untuk membuat model LDA -->
-        <div class="text-center mt-4">
-            <form method="POST" action="/generate-lda">
-                <button type="submit" class="btn btn-secondary">Buat Model LDA</button>
-            </form>
+
+        <div class="modal fade" id="loadingModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-white text-center p-4">
+                    <div class="modal-body">
+                        <div class="spinner-border text-primary mb-3" role="status"></div>
+                        <h5>Melatih model topik...</h5>
+                        <p>Harap tunggu, proses ini mungkin memakan waktu beberapa menit.</p>
+                    </div>
+                </div>
+            </div>
         </div>
+        
     </div>
 {% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById("generateLdaBtn").addEventListener("click", function () {
+        var myModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+        myModal.show();
+    });
+</script>
+{% endblock scripts %}

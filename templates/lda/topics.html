@@ -16,12 +16,14 @@
                 </div>
             {% endfor %}
         </div>
+
+        <iframe width="100%" height="600" src="{{ url_for('static', filename='lda_visualization.html') }}" frameborder="0"></iframe>
     {% else %}
         <div class="alert alert-info text-center">Belum ada topik yang tersedia.</div>
     {% endif %}
 
     <div class="text-center mt-4">
-        <a href="{{ url_for('index') }}" class="btn btn-primary">← Kembali</a>
+        <a href="{{ url_for('index_lda') }}" class="btn btn-primary">← Kembali</a>
     </div>
 </div>
 
