@@ -1,7 +1,8 @@
 
 jalankan perintah 
+```bash
 python -m venv venv
-
+```
 buka terminal
 
 ```bash
