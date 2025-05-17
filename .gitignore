@@ -50,4 +50,16 @@ pip-log.txt
 Thumbs.db
 
 models/**
+*.pkl
+*.h5
+*.hdf5
+*.json
+*.npy
+*.pkl.id2word
+*.pkl.state
+*.csv
 uploads/*
+models/
+
+
+
