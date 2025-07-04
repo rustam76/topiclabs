@@ -2,7 +2,7 @@ Berikut adalah perbaikan dan penyempurnaan dari file `README.md` yang jelas, rap
 
 ---
 
-# Topic Modelling dengan TF-IDF, LDA, dan BERTopic
+# Topic Modelling dengan TF-IDF, LDA, dan BERTopic, RNN, WORDVECTOR, SEQ2
 
 Proyek ini merupakan implementasi dari beberapa teknik **topic modelling** seperti **TF-IDF**, **LDA**, dan **BERTopic**, dengan data yang disimpan dalam basis data MySQL. Aplikasi web dibangun menggunakan **Flask** sebagai backend dan ditampilkan dalam antarmuka sederhana.
 
