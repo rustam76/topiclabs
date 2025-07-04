@@ -1,0 +1,13 @@
+{% extends "word-vector/base.html" %}
+{% block title %}Scrape Wikipedia - Word Vector App{% endblock %}
+{% block content %}
+<h2 class="mb-4">Masukkan URL Wikipedia</h2>
+<form method="POST" class="needs-validation" novalidate>
+    <div class="mb-3">
+        <label for="url" class="form-label">URL Artikel Wikipedia Bahasa Indonesia</label>
+        <input type="url" name="url" class="form-control" id="url" placeholder="Contoh: https://id.wikipedia.org/wiki/Bahasa_Indonesia " required>
+        <div class="invalid-feedback">Silakan masukkan URL valid.</div>
+    </div>
+    <button type="submit" class="btn btn-primary">Scrape</button>
+</form>
+{% endblock %}

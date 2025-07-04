@@ -1,0 +1,20 @@
+{% extends "word-vector/base.html" %}
+{% block title %}Info Model - Word Vector App{% endblock %}
+{% block content %}
+<h2>Informasi Model Word2Vec</h2>
+<p><strong>Jumlah Kata:</strong> {{ vocab_size }}</p>
+<p><strong>Dimensi Vektor:</strong> {{ vector_size }}</p>
+
+<h3>Daftar Kosakata</h3>
+<ul class="list-group">
+    {% for word in vocab_list %}
+        <li class="list-group-item">{{ word }}</li>
+    {% endfor %}
+</ul>
+
+<div class="mt-4">
+    <a href="{{ url_for('test') }}" class="btn btn-primary me-2">Uji Kata Mirip</a>
+    <a href="{{ url_for('retrain_model') }}" class="btn btn-warning me-2">Latih Ulang</a>
+    <a href="{{ url_for('delete_model') }}" class="btn btn-danger">Hapus Model</a>
+</div>
+{% endblock %}

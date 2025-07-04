@@ -1,0 +1,9 @@
+{% extends "seq/base.html" %} {% block title %}Uji Kata Mirip - SEQ
+App{% endblock %} {% block content %}
+<div class="container py-5 text-center">
+    <h2 class="mb-4">Model Berhasil Dilatih!</h2>
+    <p class="lead mb-4">Akurasi rata-rata pada epoch terakhir: <strong>{{ "{:.2f}%".format(history['accuracy'][-1] * 100) }}</strong></p>
+    
+    <a href="{{ url_for('predict') }}" class="btn btn-success btn-lg">Coba Prediksi</a>
+  </div>
+  {% endblock %}

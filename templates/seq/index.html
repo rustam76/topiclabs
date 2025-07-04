@@ -1,0 +1,37 @@
+{% extends "seq/base.html" %}
+{% block title %}Beranda - {% endblock %}
+{% block content %}
+
+<div class="container py-5">
+    <h1 class="mb-4 text-center">Seq2Seq Dataset Generator & Uploader</h1>
+
+    <!-- Card Upload Dataset -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">1. Upload Dataset CSV</h5>
+      </div>
+      <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+          <div class="mb-3">
+            <input type="file" name="dataset" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-success">Upload Dataset</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Card Generate Dataset -->
+    <div class="card shadow-sm">
+      <div class="card-header bg-success text-white">
+        <h5 class="card-title mb-0">2. Atau Generate Dataset Acak</h5>
+      </div>
+      <div class="card-body">
+        <p class="card-text">Klik tombol di bawah ini untuk menghasilkan dataset acak dan langsung mendownloadnya dalam format CSV.</p>
+        <a href="{{ url_for('generate_dataset') }}" class="btn btn-outline-success">
+          Generate & Download Dataset
+        </a>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "seq/base.html" %} {% block title %}Uji Kata Mirip - 
+App{% endblock %} {% block content %}
+  <div class="container py-5">
+    <h2 class="mb-4 text-center">Uji Coba Prediksi Model</h2>
+
+    <form method="POST" class="mb-4">
+      <div class="mb-3">
+        <label for="input_text" class="form-label">Masukkan kalimat:</label>
+        <input type="text" name="input_text" id="input_text" class="form-control" placeholder="Contoh: halo" required>
+      </div>
+      <button type="submit" class="btn btn-success">Prediksi</button>
+    </form>
+
+    {% if result %}
+    <div class="alert alert-success mt-3">
+      <strong>Hasil Prediksi:</strong> {{ result }}
+    </div>
+    {% endif %}
+  </div>
+  {% endblock %}

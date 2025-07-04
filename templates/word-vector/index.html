@@ -1,0 +1,38 @@
+{% extends "word-vector/base.html" %}
+{% block title %}Beranda - Word Vector App{% endblock %}
+{% block content %}
+<div class="text-center mb-5">
+    <h1 class="display-5 fw-bold">Selamat Datang di Aplikasi Word Vector</h1>
+    <p class="lead">Aplikasi ini membantu Anda membuat model Word2Vec menggunakan teks dari Wikipedia Bahasa Indonesia.</p>
+</div>
+
+<div class="row g-4 justify-content-center">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">🔍 Scraping Data</h5>
+                <p class="card-text">Ambil teks dari URL Wikipedia untuk dilatih sebagai word vector.</p>
+                <a href="{{ url_for('scrape') }}" class="btn btn-outline-primary">Mulai Scraping</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">⚙️ Latih Model</h5>
+                <p class="card-text">Buat model Word2Vec berdasarkan hasil scraping teks Wikipedia.</p>
+                <a href="{{ url_for('train') }}" class="btn btn-outline-success">Latih Model</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">🧪 Uji Kata Mirip</h5>
+                <p class="card-text">Temukan kata-kata yang memiliki makna mirip berdasarkan vektor kata.</p>
+                <a href="{{ url_for('test') }}" class="btn btn-outline-info">Uji Kata</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

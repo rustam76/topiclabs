@@ -1,0 +1,61 @@
+{% extends "rnn/base.html" %}
+{% block title %}Beranda - Word Vector App{% endblock %}
+{% block content %}
+
+<div class="text-center mb-5">
+  <h1 class="display-5 fw-bold">Selamat Datang di Aplikasi RNN</h1>
+  <p class="lead">
+    Aplikasi ini membantu Anda membuat model RNN menggunakan teks dari
+    Wikipedia Bahasa Indonesia.
+  </p>
+</div>
+
+<div class="row g-4 justify-content-center">
+
+  <!-- Form Scraping URL -->
+  <div class="col-md-12">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h2 class="mb-4">Masukkan URL Wikipedia</h2>
+        <form method="POST" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label for="url" class="form-label">URL Artikel Wikipedia Bahasa Indonesia</label>
+            <input
+              type="url"
+              name="url"
+              class="form-control"
+              id="url"
+              placeholder="Contoh: https://id.wikipedia.org/wiki/Bahasa_Indonesia "
+              required
+            />
+            <div class="invalid-feedback">Silakan masukkan URL valid.</div>
+          </div>
+          <button type="submit" class="btn btn-primary">Scrape & Download</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Upload TXT -->
+  <div class="col-md-12">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title">🔍 Upload File TXT untuk Melatih Model RNN</h5>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div>{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+          <input type="file" name="file" class="form-control" required /><br />
+          <button type="submit" class="btn btn-primary">Latih Model</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
